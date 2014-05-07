@@ -3,7 +3,8 @@ body {
 }
 
 .main {
-	width:100%;
+	width:1024px;
+	margin:10px auto 0 auto;
 }
 
 /*3d model in here*/
