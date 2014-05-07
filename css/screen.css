@@ -1,0 +1,128 @@
+body {
+	font-family: "Lato", Helvetica, Arial, sans-serif;
+}
+
+.main {
+	width:100%;
+}
+
+/*3d model in here*/
+.main .model {
+	width:100%;
+	position: relative;
+}
+
+.main .model img {
+	width:100%;
+}
+
+.main .model .imageHolder.rotate {
+	cursor:-webkit-grab;
+}
+
+.main .model .imageHolder.rotating {
+	cursor:-webkit-grabbing;
+}
+
+/*menu*/
+.main .menu {
+	width:80px;
+	height:50%;
+	position: absolute;
+	bottom:25%;
+	left:0;
+	z-index: 1;
+}
+
+.main .menu .buttonHolder {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.main .menu .buttonHolder .buttons {
+	height:162px;
+	width:65px;
+}
+
+.main .menu .buttonHolder .buttons a {
+	width:100%;
+	height:65px;
+	background:white;
+	border-bottom: 1px solid #ccc;
+	display: block;
+	opacity: .75;
+	cursor: pointer; 
+}
+
+.main .menu .buttonHolder .buttons a#rotate {
+	border-radius: 0 4px 0 0;
+	background:white url('../img/rotate.png') 6px 15px no-repeat;
+	background-size:80% 45px;
+}
+
+.main .menu .buttonHolder .buttons a#materials {
+	border-radius: 0 0 4px 0;
+}
+
+.main .menu .buttonHolder .buttons a.active {
+	opacity: 1;
+}
+
+.materialsOverlay {
+  position: relative;
+  background: #FFF;
+  padding: 20px;
+  width:auto;
+  max-width: 600px;
+  margin:0 auto;
+  border-radius: 4px;
+}
+
+.materialsOverlay h1 {
+	font-weight: bold;
+	font-size:18px;
+}
+
+.materialsOverlay ul li {
+	width:80px;
+	height:80px;
+	display: block;
+	border-radius: 4px;
+	background: gray;
+	float:left;
+	margin:10px 10px 0 0;
+}
+
+/* overlay at start */
+.mfp-fade.mfp-bg {
+  opacity: 0;
+
+  -webkit-transition: all 0.15s ease-out;
+  -moz-transition: all 0.15s ease-out;
+  transition: all 0.15s ease-out;
+}
+/* overlay animate in */
+.mfp-fade.mfp-bg.mfp-ready {
+  opacity: 0.8;
+}
+/* overlay animate out */
+.mfp-fade.mfp-bg.mfp-removing {
+  opacity: 0;
+}
+
+/* content at start */
+.mfp-fade.mfp-wrap .mfp-content {
+  opacity: 0;
+
+  -webkit-transition: all 0.15s ease-out;
+  -moz-transition: all 0.15s ease-out;
+  transition: all 0.15s ease-out;
+}
+/* content animate it */
+.mfp-fade.mfp-wrap.mfp-ready .mfp-content {
+  opacity: 1;
+}
+/* content animate out */
+.mfp-fade.mfp-wrap.mfp-removing .mfp-content {
+  opacity: 0;
+}
