@@ -1,10 +1,16 @@
 $(function() {
 
-	//defaults. just use jquery for basic dom stuff
-  $(".main .model img").hide();
-  $(".main .model img:eq(0)").show();
+	//defaults
   $("a#rotate").addClass("active");
   $(".main .model .imageHolder").addClass("rotate");
+
+  //disable "bounce"
+  $(document).bind(
+        'touchmove',
+            function(e) {
+              e.preventDefault();
+            }
+  );
 
   //get this out of global scope
   var menu = {}
@@ -23,21 +29,37 @@ $(function() {
   });
 
   menu.materialsButtonTap = Hammer( menu.materialsButton ).on("tap", function(event) {
-		//materials button opens menu
-		$.magnificPopup.open({
-		  items: {
-		    src: $(".materialsOverlay"), // can be a HTML string, jQuery object, or CSS selector
-		    type: 'inline'
-		  },
-		  mainClass: 'mfp-fade',
-		  removalDelay: 300,
-		  callbacks: {
-		  	close: function () {
-		  		//may want something here
-		  	}
-		  }
-		});
+		//nothing at the moment
+  });
 
+  $('a#materials').magnificPopup({ 
+      items: {
+        src: $(".materialsOverlay"), // can be a HTML string, jQuery object, or CSS selector
+        type: 'inline'
+      },
+      mainClass: 'mfp-fade',
+      removalDelay: 300,
+      callbacks: {
+        open: function () {
+          $("a").removeClass("active");
+          $("a#materials").addClass("active");
+        },
+        close: function () {
+          $("a").removeClass("active");
+          $("a#rotate").addClass("active");
+        }
+      }
+  });
+
+  //materials
+  $("ul.materials li").click( function(index) {
+    console.log( $(this).data("material") );
+    var myMaterialName = $(this).data("material");
+
+    $("ul.materials li").removeClass("selected");
+    $(this).addClass("selected");
+    $(".main .model .imageHolder img").removeClass("selected");
+    $(".main .model .imageHolder img." + myMaterialName + "").addClass("selected");
   });
 
   //drag events
@@ -48,6 +70,9 @@ $(function() {
   menu.imageHolderDragStart = Hammer( menu.imageHolder ).on("drag", function(event) {
   	$(".main .model .imageHolder").removeClass("rotate");
   	$(".main .model .imageHolder").addClass("rotating");
+    $("#dragDistance").val( "" + Math.floor( event.gesture.distance ) + "");
+    $("#dragAngle").val( "" + Math.floor( event.gesture.angle ) + "");
+    $("#dragDirection").val( "" + event.gesture.direction + "");
   });
 
   menu.imageHolderDragEnd = Hammer( menu.imageHolder ).on("dragend", function(event) {

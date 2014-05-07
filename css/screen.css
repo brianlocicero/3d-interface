@@ -4,7 +4,7 @@ body {
 
 .main {
 	width:1024px;
-	margin:10px auto 0 auto;
+	margin:0 auto;
 }
 
 /*3d model in here*/
@@ -15,57 +15,62 @@ body {
 
 .main .model img {
 	width:100%;
+  display: none;
+}
+
+.main .model img.selected {
+  display: block;
 }
 
 .main .model .imageHolder.rotate {
-	cursor:-webkit-grab;
+	cursor:url('../img/cursor-rotate.png'), auto;
 }
 
 .main .model .imageHolder.rotating {
-	cursor:-webkit-grabbing;
+	cursor:url('../img/cursor-rotate.png'), auto;
 }
 
 /*menu*/
 .main .menu {
 	width:80px;
-	height:50%;
+	height:170px;
+  margin:0;
+  padding:0;
 	position: absolute;
-	bottom:25%;
-	left:0;
+	left:10px;
+	top:10px;
 	z-index: 1;
 }
 
-.main .menu .buttonHolder {
-	display: table-cell;
-	vertical-align: middle;
+.main .menu .buttons {
+	height:170px;
+	width:80px;
 }
 
-.main .menu .buttonHolder .buttons {
-	height:162px;
-	width:65px;
-}
-
-.main .menu .buttonHolder .buttons a {
+.main .menu .buttons a {
 	width:100%;
-	height:65px;
+  width:80px;
+	height:18px;
+  padding:62px 0 0 0;
 	background:white;
-	border-bottom: 1px solid #ccc;
-	display: block;
-	opacity: .75;
+	display:block;
+	opacity:.75;
 	cursor: pointer; 
+  border-radius: 4px;
+  margin-top:4px;
+  text-align: center;
+  font-size:13px;
 }
 
-.main .menu .buttonHolder .buttons a#rotate {
-	border-radius: 0 4px 0 0;
-	background:white url('../img/rotate.png') 6px 15px no-repeat;
-	background-size:80% 45px;
+.main .menu .buttons a#rotate {
+	background:white url('../img/rotate-small.png') 0 3px no-repeat;
 }
 
-.main .menu .buttonHolder .buttons a#materials {
-	border-radius: 0 0 4px 0;
+.main .menu .buttons a#materials {
+  background:white url('../img/materials.png') 0 3px no-repeat;
 }
 
-.main .menu .buttonHolder .buttons a.active {
+.main .menu .buttons a.active {
 	opacity: 1;
 }
 
@@ -85,13 +90,45 @@ body {
 }
 
 .materialsOverlay ul li {
-	width:80px;
-	height:80px;
+  width:80px;
+  height:90px;
+  display: block;
+  float:left;
+  margin:10px 10px 0 0;
+  text-align: center;
+  font-size:13px;
+  cursor: pointer;
+}
+
+.materialsOverlay ul li div {
+	width:76px;
+	height:76px;
+  border:2px solid #ccc;
 	display: block;
 	border-radius: 4px;
+  margin:0 0 5px 0;
 	background: gray;
-	float:left;
-	margin:10px 10px 0 0;
+}
+
+.materialsOverlay ul li.selected div {
+  border:2px solid #0a5592;
+}
+
+.materialsOverlay ul li.beige div {
+  background:#d6ccbe;
+}
+
+.materialsOverlay ul li.pink div {
+  background:#fed2d6;
+}
+
+.output {
+  margin:10px auto;
+}
+
+.output label {
+  display: inline-block;
+  margin:0 0 0 15px;
 }
 
 /* overlay at start */

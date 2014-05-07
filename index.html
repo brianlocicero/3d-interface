@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>3D Interface</title>
+	<meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 	<link rel="stylesheet" href="css/reset.css" />
 	<link rel="stylesheet" href="css/screen.css" />
 	<link rel="stylesheet" href="css/popup.css" />
@@ -13,11 +14,14 @@
 	<div class="materialsOverlay mfp-hide">
 		<h1>Materials</h1>
 		<ul class="materials">
-			<li class="selected">Beige</li>
-			<li>Pink</li>
-			<li>Red</li>
-			<li>Blue</li>
-			<li>Green</li>
+			<li class="selected beige" data-material="beige">
+				<div></div>
+				Beige
+			</li>
+			<li class="pink" data-material="pink">
+				<div></div>
+				Pink
+			</li>
 		</ul>
 		<div style="clear:both">&nbsp;</div>
 	</div>
@@ -29,20 +33,24 @@
 
 			<!-- images -->
 			<div class="imageHolder" id="imageHolder">
-				<img src="img/building1.png" />
-				<img src="img/building2.png" />
+				<img src="img/building1.jpg" class="selected beige"/>
+				<img src="img/building2.jpg" class="pink"/>
 			</div>
 
 			<!-- menu -->
 			<div class="menu">
-				<div class="buttonHolder">
-					<div class="buttons">
-						<a id="rotate">Rotate</a>
-						<a id="materials">Materials</a>
-					</div>
+				<div class="buttons">
+					<a id="rotate">Rotate</a>
+					<a id="materials">Materials</a>
 				</div>
 			</div>
 
+		</div>
+
+		<div class="output">
+			<label>Drag Distance:</label> <input type="text" id="dragDistance" />
+			<label>Drag Angle:</label> <input type="text" id="dragAngle" />
+			<label>Drag Direction:</label> <input type="text" id="dragDirection" />
 		</div>
 
 	</div>
