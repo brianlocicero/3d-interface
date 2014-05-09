@@ -30,6 +30,23 @@ body {
 	cursor:url('../img/cursor-rotate.png'), auto;
 }
 
+/*real 3d*/
+.main .model .sceneHolder {
+  width:1024px;
+  height:566px;
+  background: #efefef;
+  margin:0;
+  padding:0;
+}
+
+.main .model .sceneHolder.rotate {
+  cursor:url('../img/cursor-rotate.png'), auto;
+}
+
+.main .model .sceneHolder.rotating {
+  cursor:url('../img/cursor-rotate.png'), auto;
+}
+
 /*menu*/
 .main .menu {
 	width:80px;
