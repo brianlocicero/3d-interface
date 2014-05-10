@@ -14,22 +14,14 @@
 	<div class="materialsOverlay mfp-hide">
 		<h1>Materials</h1>
 		<ul class="materials">
-			<li class="selected beige" data-material="beige" data-color="0xd6ccbe">
+			<li class="selected beige" data-material="beige">
 				<div></div>
 				Beige
 			</li>
-			<li class="pink" data-material="pink" data-color="0xfed2d6">
+			<li class="pink" data-material="pink">
 				<div></div>
 				Pink
 			</li>
-			<li class="red" data-material="red" data-color="0xff0000"><div></div>Red</li>
-			<li class="green" data-material="green" data-color="0x00ff00"><div></div>Green</li>
-			<li class="blue" data-material="blue" data-color="0x0000ff"><div></div>Blue</li>
-			<li class="yellow" data-material="yellow" data-color="0xffff00"><div></div>Yellow</li>
-			<li class="teal" data-material="teal" data-color="0x00ffff"><div></div>Teal</li>
-			<li class="purple" data-material="purple" data-color="0xff00ff"><div></div>Purple</li>
-			<li class="gray" data-material="gray" data-color="0xc0c0c0"><div></div>Gray</li>
-			<li class="white" data-material="white" data-color="0xffffff"><div></div>White</li>
 		</ul>
 		<div style="clear:both">&nbsp;</div>
 	</div>
@@ -39,7 +31,10 @@
 		<!-- 3d model view -->
 		<div class="model">
 
-			<div class="sceneHolder" id="sceneHolder">
+			<!-- images -->
+			<div class="imageHolder" id="imageHolder">
+				<img src="img/building1.jpg" class="selected beige"/>
+				<img src="img/building2.jpg" class="pink"/>
 			</div>
 
 			<!-- menu -->
@@ -53,13 +48,9 @@
 		</div>
 
 		<div class="output">
-			<!--
 			<label>Drag Distance:</label> <input type="text" id="dragDistance" />
 			<label>Drag Angle:</label> <input type="text" id="dragAngle" />
 			<label>Drag Direction:</label> <input type="text" id="dragDirection" />
-			<label>Pinch Scale</label> <input type="text" id="pinchScale" />
-			-->
-			<p><span style="font-weight:bold">To Zoom:</span> <span style="font-style:italic">Pinch, Double-Tap or Double-Click</span></p>
 		</div>
 
 	</div>
@@ -67,9 +58,6 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/hammer.min.js"></script>
 <script src="js/popup.js"></script>
-<script src="js/three.js"></script>
 <script src="js/menu.js"></script>
-<script src="js/geometry.js"></script>
-
 </body>
 </html>

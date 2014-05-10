@@ -139,6 +139,40 @@ body {
   background:#fed2d6;
 }
 
+.materialsOverlay ul li.red div {
+  background:#ff0000;
+}
+
+.materialsOverlay ul li.green div {
+  background:#00ff00;
+}
+
+.materialsOverlay ul li.blue div {
+  background:#0000ff;
+}
+
+.materialsOverlay ul li.yellow div {
+  background:#ffff00;
+}
+
+.materialsOverlay ul li.teal div {
+  background:#00ffff;
+}
+
+.materialsOverlay ul li.purple div {
+  background:#ff00ff;
+}
+
+.materialsOverlay ul li.gray div {
+  background:#c0c0c0;
+}
+
+.materialsOverlay ul li.white div {
+  background:#ffffff;
+}
+
+
+
 .output {
   margin:10px auto;
 }

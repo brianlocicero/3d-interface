@@ -2,7 +2,7 @@ $(function() {
 
 	//defaults
   $("a#rotate").addClass("active");
-  $(".main .model .imageHolder").addClass("rotate");
+  $(".main .model .sceneHolder").addClass("rotate");
 
   //disable "bounce"
   $(document).bind(
@@ -13,19 +13,19 @@ $(function() {
   );
 
   //get this out of global scope
-  var menu = {}
+  menu = {};
 
   //for hammer
   menu.rotateButton = document.getElementById("rotate");
   menu.materialsButton = document.getElementById("materials");
-  menu.imageHolder = document.getElementById("imageHolder");
+  menu.sceneHolder = document.getElementById("sceneHolder");
 
   //taps
   menu.rotateButtonTap = Hammer( menu.rotateButton ).on("tap", function(event) {
   	$("a").removeClass("active");
     $("a#rotate").addClass("active");
-  	$(".main .model .imageHolder").addClass("rotate");
-  	$(".main .model .imageHolder").removeClass("rotating");
+  	$(".main .model .sceneHolder").addClass("rotate");
+  	$(".main .model .sceneHolder").removeClass("rotating");
   });
 
   menu.materialsButtonTap = Hammer( menu.materialsButton ).on("tap", function(event) {
@@ -53,31 +53,121 @@ $(function() {
 
   //materials
   $("ul.materials li").click( function(index) {
-    console.log( $(this).data("material") );
     var myMaterialName = $(this).data("material");
+    var myMaterialColor = Number( $(this).data("color") );
+
+    var newMaterial = new THREE.MeshLambertMaterial( { color: myMaterialColor } );
+    updateMaterial( newMaterial );
 
     $("ul.materials li").removeClass("selected");
     $(this).addClass("selected");
-    $(".main .model .imageHolder img").removeClass("selected");
-    $(".main .model .imageHolder img." + myMaterialName + "").addClass("selected");
+    $(".main .model .sceneHolder img").removeClass("selected");
+    $(".main .model .sceneHolder img." + myMaterialName + "").addClass("selected");
   });
 
   //drag events
-  menu.imageHolderDragStart = Hammer( menu.imageHolder ).on("dragstart", function(event) {
+  menu.sceneHolderDragStart = Hammer( menu.sceneHolder ).on("dragstart", function(event) {
   	//nothing yet
   });
 
-  menu.imageHolderDragStart = Hammer( menu.imageHolder ).on("drag", function(event) {
-  	$(".main .model .imageHolder").removeClass("rotate");
-  	$(".main .model .imageHolder").addClass("rotating");
-    $("#dragDistance").val( "" + Math.floor( event.gesture.distance ) + "");
-    $("#dragAngle").val( "" + Math.floor( event.gesture.angle ) + "");
-    $("#dragDirection").val( "" + event.gesture.direction + "");
+  menu.sceneHolderDragStart = Hammer( menu.sceneHolder ).on("drag", function(event) {
+  	$(".main .model .sceneHolder").removeClass("rotate");
+  	$(".main .model .sceneHolder").addClass("rotating");
+    //$("#dragDistance").val( "" + Math.floor( event.gesture.distance ) + "");
+    //$("#dragAngle").val( "" + Math.floor( event.gesture.angle ) + "");
+    //$("#dragDirection").val( "" + event.gesture.direction + "");
+
+    //var yAxis = new THREE.Vector3(0,1,0);
+    //rotateAroundObjectAxis(mesh, yAxis, -(Math.PI / 180) );
+
+    if ( event.gesture.direction == "up" ) {
+      var xAxisUp = new THREE.Vector3(1,0,0);
+      rotateAroundWorldAxis(mesh, xAxisUp, -(Math.PI / 180) * 2);
+    } 
+
+    if ( event.gesture.direction == "down" ) {
+      var xAxisDown = new THREE.Vector3(1,0,0);
+      rotateAroundWorldAxis(mesh, xAxisDown, Math.PI / 180 * 2);
+    }
+
+    if ( event.gesture.direction == "right" ) {
+      var yAxisRight = new THREE.Vector3(0,1,0);
+      rotateAroundWorldAxis(mesh, yAxisRight, Math.PI / 180 * 2 );
+    }
+
+    if ( event.gesture.direction == "left" ) {
+      var yAxisLeft = new THREE.Vector3(0,1,0);
+      rotateAroundWorldAxis(mesh, yAxisLeft, -(Math.PI / 180) * 2);
+    }
+
   });
 
-  menu.imageHolderDragEnd = Hammer( menu.imageHolder ).on("dragend", function(event) {
-  	$(".main .model .imageHolder").removeClass("rotating");
-  	$(".main .model .imageHolder").addClass("rotate");
+  menu.sceneHolderDragEnd = Hammer( menu.sceneHolder ).on("dragend", function(event) {
+  	$(".main .model .sceneHolder").removeClass("rotating");
+  	$(".main .model .sceneHolder").addClass("rotate");
+  });
+
+  menu.zoomValue = 1;
+  menu.pinched = false;
+  menu.zooming = false;
+
+  menu.zoomIn = function () {
+
+    menu.zoomValue -= .01;
+    if (menu.zoomValue <= .5) {
+      clearInterval(menu.zoomInterval);
+      menu.zooming = false;
+      return;
+    }
+    camera.fov = fov * menu.zoomValue;
+    camera.updateProjectionMatrix();
+  }
+
+  menu.zoomOut = function () {
+    menu.zoomValue += .01;
+    if (menu.zoomValue >= 1) {
+      clearInterval(menu.zoomInterval);
+      menu.zooming = false;
+      return;
+    }
+    camera.fov = fov * menu.zoomValue;
+    camera.updateProjectionMatrix(); 
+  }
+
+  menu.sceneHolderDoubleTap = Hammer( menu.sceneHolder ).on("doubletap", function(event) {
+
+    if (menu.pinched) {
+      camera.fov = 45;
+      camera.updateProjectionMatrix();
+      menu.pinched = false;
+      return;
+    }
+
+
+    if ( !menu.zooming ) {
+      if (menu.zoomValue === 1) {
+        menu.zoomInterval = setInterval(menu.zoomIn, 10);
+        menu.zooming = true;
+      } else {
+        menu.zoomInterval = setInterval(menu.zoomOut, 10);
+        menu.zooming = true;
+      }
+    }
+
+  });
+
+  menu.sceneHolderDoubleTap = Hammer( menu.sceneHolder ).on("pinchin", function(event) {
+    //$("#pinchScale").val( "" + event.gesture.scale + "");
+    camera.fov = fov * event.gesture.scale;
+    camera.updateProjectionMatrix();
+    menu.pinched = true;
+  });
+
+  menu.sceneHolderDoubleTap = Hammer( menu.sceneHolder ).on("pinchout", function(event) {
+    //$("#pinchScale").val( "" + event.gesture.scale + "");
+    camera.fov = fov * event.gesture.scale;
+    camera.updateProjectionMatrix();
+    menu.pinched = true;
   });
 
 });

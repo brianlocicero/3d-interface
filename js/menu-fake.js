@@ -2,7 +2,7 @@ $(function() {
 
 	//defaults
   $("a#rotate").addClass("active");
-  $(".main .model .sceneHolder").addClass("rotate");
+  $(".main .model .imageHolder").addClass("rotate");
 
   //disable "bounce"
   $(document).bind(
@@ -13,19 +13,19 @@ $(function() {
   );
 
   //get this out of global scope
-  menu = {};
+  var menu = {}
 
   //for hammer
   menu.rotateButton = document.getElementById("rotate");
   menu.materialsButton = document.getElementById("materials");
-  menu.sceneHolder = document.getElementById("sceneHolder");
+  menu.imageHolder = document.getElementById("imageHolder");
 
   //taps
   menu.rotateButtonTap = Hammer( menu.rotateButton ).on("tap", function(event) {
   	$("a").removeClass("active");
     $("a#rotate").addClass("active");
-  	$(".main .model .sceneHolder").addClass("rotate");
-  	$(".main .model .sceneHolder").removeClass("rotating");
+  	$(".main .model .imageHolder").addClass("rotate");
+  	$(".main .model .imageHolder").removeClass("rotating");
   });
 
   menu.materialsButtonTap = Hammer( menu.materialsButton ).on("tap", function(event) {
@@ -58,45 +58,26 @@ $(function() {
 
     $("ul.materials li").removeClass("selected");
     $(this).addClass("selected");
-    $(".main .model .sceneHolder img").removeClass("selected");
-    $(".main .model .sceneHolder img." + myMaterialName + "").addClass("selected");
+    $(".main .model .imageHolder img").removeClass("selected");
+    $(".main .model .imageHolder img." + myMaterialName + "").addClass("selected");
   });
 
   //drag events
-  menu.sceneHolderDragStart = Hammer( menu.sceneHolder ).on("dragstart", function(event) {
+  menu.imageHolderDragStart = Hammer( menu.imageHolder ).on("dragstart", function(event) {
   	//nothing yet
   });
 
-  menu.sceneHolderDragStart = Hammer( menu.sceneHolder ).on("drag", function(event) {
-  	$(".main .model .sceneHolder").removeClass("rotate");
-  	$(".main .model .sceneHolder").addClass("rotating");
+  menu.imageHolderDragStart = Hammer( menu.imageHolder ).on("drag", function(event) {
+  	$(".main .model .imageHolder").removeClass("rotate");
+  	$(".main .model .imageHolder").addClass("rotating");
     $("#dragDistance").val( "" + Math.floor( event.gesture.distance ) + "");
     $("#dragAngle").val( "" + Math.floor( event.gesture.angle ) + "");
     $("#dragDirection").val( "" + event.gesture.direction + "");
-
-    var dragAngle = Math.floor( event.gesture.angle );
-
-    if ( dragAngle < 0 ) {
-      mesh.rotation.x -= .1;
-    } 
-
-    if ( dragAngle > 0 ) {
-      mesh.rotation.x += .1;
-    }
-
-    if ( event.gesture.direction == "right" ) {
-      mesh.rotation.y -= .1;
-    }
-
-    if ( event.gesture.direction == "left" ) {
-      mesh.rotation.y += .1;
-    }
-
   });
 
-  menu.sceneHolderDragEnd = Hammer( menu.sceneHolder ).on("dragend", function(event) {
-  	$(".main .model .sceneHolder").removeClass("rotating");
-  	$(".main .model .sceneHolder").addClass("rotate");
+  menu.imageHolderDragEnd = Hammer( menu.imageHolder ).on("dragend", function(event) {
+  	$(".main .model .imageHolder").removeClass("rotating");
+  	$(".main .model .imageHolder").addClass("rotate");
   });
 
 });
