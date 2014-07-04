@@ -1,6 +1,140 @@
 /// <reference path="three.d.ts" />
 
-var container, scene, camera, renderer, stats;
+class PCamera {
+	private camera:any;
+	private screenWidth:number;
+	private screenHeight:number;
+	private near:number;
+	private far:number;
+	private angle:number;
+	private position:number[];
+	private aspect:number;
+	public scene:any;
+
+	constructor (screenWidth:number, screenHeight:number, near:number, far:number, angle:number, position:number[]) {
+		this.screenHeight = screenHeight;
+		this.screenWidth = screenWidth;
+		this.near = near;
+		this.far = far;
+		this.angle = angle;
+		this.position = position;
+		this.aspect = screenWidth/screenWidth;
+	}
+
+	addCamera(scene:any):void {
+		this.camera = new THREE.PerspectiveCamera(this.angle, this.aspect, this.near, this.far);
+		this.camera.position.set( this.position[0], this.position[1], this.position[2] );
+		this.scene = scene;
+		this.scene.add(this.camera);
+		this.camera.lookAt(this.scene.position);
+	}
+
+	getCamera():any {
+		return this.camera;
+	}
+}
+
+class WebGLRenderer {
+	private renderer:any;
+	private color:any;
+	private opacity:number;
+	private shadowMapEnabled:boolean;
+	private screenWidth:number;
+	private screenHeight:number;
+
+	constructor (color:any, opacity:number, shadowMapEnabled:boolean, screenWidth:number, screenHeight:number) {
+		this.color = color;
+		this.opacity = opacity;
+		this.shadowMapEnabled = shadowMapEnabled;
+		this.screenWidth = screenWidth;
+		this.screenHeight = screenHeight;
+  	this.renderer = new THREE.WebGLRenderer();
+  	this.renderer.setClearColorHex(this.color, this.opacity);
+  	this.renderer.shadowMapEnabled = true;
+  	this.renderer.setSize(this.screenWidth, this.screenHeight);
+	}
+
+	getRenderer():any {
+		return this.renderer;
+	}
+}
+
+class SLight {
+	private light:any;
+	private color:any;
+	private position:number[];
+	private castShadow:boolean;
+	private scene:any;
+
+	constructor(color:any, position:number[], castShadow:boolean) {
+		this.color = color;
+		this.position = position;
+		this.castShadow = castShadow;
+		this.light = new THREE.SpotLight(color);
+		this.light.position.set( this.position[0], this.position[1], this.position[2] );
+		this.light.castShadow = this.castShadow;
+	}
+
+	addLight(scene:any):void {
+		this.scene = scene;
+		this.scene.add(this.light);
+	}
+
+	getLight():any {
+		return this.light;
+	}
+}
+
+class Floor {
+
+	private floor:any;
+	private texture:any;
+	private texturePath:string;
+	private material:any;
+	private geometry:any;
+	private size:number[];
+	private receiveShadow:boolean;
+	private rotationX:number;
+	private positionY:number;
+	private rotationZ:number;
+	private scene:any;
+
+	constructor (texturePath:string, size:number[], rotationX:number, positionY:number, rotationZ:number, receiveShadow:boolean) {
+		this.texturePath = texturePath;
+		this.size = size;
+		this.rotationX = rotationX;
+		this.positionY = positionY;
+		this.rotationZ = rotationZ;
+		this.receiveShadow = receiveShadow;
+		this.texture = THREE.ImageUtils.loadTexture(this.texturePath);
+		this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping;
+		this.texture.repeat.set(10, 10);
+		this.material = new THREE.MeshBasicMaterial( {map: this.texture, side: THREE.DoubleSide} );
+		this.geometry = new THREE.PlaneGeometry(this.size[0], this.size[1], this.size[2], this.size[3]);
+		this.floor = new THREE.Mesh(this.geometry, this.material);
+		this.floor.rotation.x = this.rotationX;
+		this.floor.position.y = this.positionY;
+		this.floor.rotation.z = this.rotationZ;
+		this.floor.receiveShadow = this.receiveShadow;
+	}
+
+	addFloor(scene:any) {
+		this.scene = scene;
+		this.scene.add(this.floor);
+	}
+
+	getFloor():any {
+		return this.floor;
+	}
+
+}
+
+var myCamera = new PCamera(1024, 768, 0.1, 20000, 45, [0, 150, 400]);
+var myRenderer = new WebGLRenderer(0xEEEEEE, 1.0, true, 1024, 768);
+var myLight = new SLight(0xFFFFFF, [100, 550, 100], true);
+var myFloor = new Floor('img/WoodFine0008_S.jpg', [1000, 1000, 10, 10], Math.PI/2, -50, 67.5, true);
+
+var container, scene, renderer, stats;
 var mesh;
 
 init();
@@ -11,46 +145,17 @@ function init()
 {
 	// SCENE
 	scene = new THREE.Scene();
+	var axes = new THREE.AxisHelper( 0 );
+	scene.add(axes);
 
-	        var axes = new THREE.AxisHelper( 0 );
-        scene.add(axes);
-
-	// CAMERA
-	var SCREEN_WIDTH = 1024, SCREEN_HEIGHT = 768;
-	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
-	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-	scene.add(camera);
-	camera.position.set(0,150,400);
-	camera.lookAt(scene.position);
-
-	// RENDERER
-  renderer = new THREE.WebGLRenderer();
-	renderer.setClearColorHex(0xEEEEEE, 1.0);
-	renderer.shadowMapEnabled = true;
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	myCamera.addCamera(scene);
+	myLight.addLight(scene);
+	myFloor.addFloor(scene);
 
 	container = document.getElementById( 'sceneHolder' );
-	container.appendChild( renderer.domElement );
+	container.appendChild( myRenderer.getRenderer().domElement );
 
-	// LIGHT
-	var light = new THREE.SpotLight(0xffffff);
-	light.position.set(100,550,100);
-	light.castShadow = true;
-	scene.add(light);
 
-	// FLOOR
-	//var floorTexture = new THREE.ImageUtils.loadTexture('img/WoodFine0008_S.jpg');
-	//floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-	//floorTexture.repeat.set( 10, 10 );
-	//var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -50;
-	floor.rotation.x = Math.PI / 2;
-	floor.rotation.z = 67.5;
-	floor.receiveShadow  = true;
-	scene.add(floor);
 
 	// SKYBOX
 	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
@@ -102,17 +207,7 @@ function animate()
   render();		
 }
 
-var fov = camera.fov, zoom = 1.0, inc = -0.01;
-
 function render() 
 {
-	/*
-  camera.fov = fov * zoom;
-  camera.updateProjectionMatrix();
-  zoom += inc;
-  if ( zoom <= 0.2 || zoom >= 1.0 ) {
-     inc = -inc;
-  }
-  */
-	renderer.render( scene, camera );
+	myRenderer.getRenderer().render( scene, myCamera.getCamera() );
 }
