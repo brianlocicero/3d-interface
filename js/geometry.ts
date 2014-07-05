@@ -9,7 +9,8 @@ class PCamera {
 	private angle:number;
 	private position:number[];
 	private aspect:number;
-	public scene:any;
+	private scene:any;
+	private fov:number; 
 
 	constructor (screenWidth:number, screenHeight:number, near:number, far:number, angle:number, position:number[]) {
 		this.screenHeight = screenHeight;
@@ -21,16 +22,25 @@ class PCamera {
 		this.aspect = screenWidth/screenWidth;
 	}
 
-	addCamera(scene:any):void {
+	public addCamera(scene:any):void {
 		this.camera = new THREE.PerspectiveCamera(this.angle, this.aspect, this.near, this.far);
 		this.camera.position.set( this.position[0], this.position[1], this.position[2] );
 		this.scene = scene;
 		this.scene.add(this.camera);
 		this.camera.lookAt(this.scene.position);
+		this.fov = this.camera.fov;
 	}
 
-	getCamera():any {
+	public getCamera():any {
 		return this.camera;
+	}
+
+	public getFov():number {
+		return this.camera.fov;
+	}
+
+	public setFov(fov:number) {
+		this.camera.fov = fov;
 	}
 }
 
@@ -129,85 +139,74 @@ class Floor {
 
 }
 
-var myCamera = new PCamera(1024, 768, 0.1, 20000, 45, [0, 150, 400]);
-var myRenderer = new WebGLRenderer(0xEEEEEE, 1.0, true, 1024, 768);
-var myLight = new SLight(0xFFFFFF, [100, 550, 100], true);
-var myFloor = new Floor('img/WoodFine0008_S.jpg', [1000, 1000, 10, 10], Math.PI/2, -50, 67.5, true);
+class CGeometry {
 
-var container, scene, renderer, stats;
-var mesh;
+	private cubeVars:number[];
+	private cubeGeometry:any;
 
-init();
-animate();
-
-// FUNCTIONS 		
-function init() 
-{
-	// SCENE
-	scene = new THREE.Scene();
-	var axes = new THREE.AxisHelper( 0 );
-	scene.add(axes);
-
-	myCamera.addCamera(scene);
-	myLight.addLight(scene);
-	myFloor.addFloor(scene);
-
-	container = document.getElementById( 'sceneHolder' );
-	container.appendChild( myRenderer.getRenderer().domElement );
-
-
-
-	// SKYBOX
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
-	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-	scene.add(skyBox);
-	
-	////////////
-	// CUSTOM //
-	////////////
-	
-	var geometry = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1 );
-	var material = new THREE.MeshLambertMaterial( { color: 0xd6ccbe } );
-	mesh = new THREE.Mesh( geometry, material );
-	mesh.position.set(0,60,50);
-	mesh.castShadow = true;
-	scene.add(mesh);
-	
+	constructor(cubeVars:number[]) {
+		this.cubeVars = cubeVars;
+		this.cubeGeometry = new THREE.CubeGeometry(this.cubeVars[0], this.cubeVars[1], this.cubeVars[2], 1, 1, 1);
+		return this.cubeGeometry;
+	}
 }
 
-//helpers
-var rotObjectMatrix;
-function rotateAroundObjectAxis (object, axis, radians) {
-  rotObjectMatrix = new THREE.Matrix4();
-  rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
-  object.matrix.multiply(rotObjectMatrix);
-  object.rotation.setFromRotationMatrix(object.matrix);
+class LMaterial {
+
+	private lambertMaterial:any;
+	private materialColor:any;
+
+	constructor(materialColor:any) {
+		this.materialColor = materialColor;
+		this.lambertMaterial = new THREE.MeshLambertMaterial( { color: this.materialColor } );
+		return this.lambertMaterial;
+	}
 }
 
-var rotWorldMatrix;      
-function rotateAroundWorldAxis(object, axis, radians) {
-    rotWorldMatrix = new THREE.Matrix4();
-    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-    rotWorldMatrix.multiply(object.matrix);
-    object.matrix = rotWorldMatrix;
-    object.rotation.setFromRotationMatrix(object.matrix);
+class Mesh {
+
+	private mesh:any;
+	private geometry:any;
+	private material:any;
+	private castShadow:boolean;
+	private position:number[];
+	private scene:any;
+
+	constructor(geometry:any, material:any, castShadow:boolean) {
+		this.geometry = geometry;
+		this.material = material;
+		this.castShadow = castShadow;
+		this.mesh = new THREE.Mesh(this.geometry, this.material);
+		this.mesh.castShadow = this.castShadow;
+	}
+
+	addMesh(scene:any) {
+		this.scene = scene;
+		scene.add(this.mesh);
+	}
+
+	getMesh():any {
+		return this.mesh;
+	}
+
+	setPosition(position:number[]) {
+		this.position = position;
+		this.mesh.position.set(position[0], position[1], position[2]);
+	}
 }
 
-function updateMaterial (material) {
-	var newMaterial = material;
-	mesh.material = newMaterial;
-	mesh.material.needsUpdate = true;
-}
+class Scene {
+	private scene;
+	private axes;
+	private axesHelper:boolean;
 
-function animate() 
-{
-
-  requestAnimationFrame( animate );
-  render();		
-}
-
-function render() 
-{
-	myRenderer.getRenderer().render( scene, myCamera.getCamera() );
+	constructor(axesHelper:boolean) {
+		this.scene = new THREE.Scene();
+		this.axesHelper = axesHelper;
+		if (axesHelper) {
+			this.axes = new THREE.AxisHelper( 0 );
+			this.scene.add(this.axes);
+		}
+		return this.scene;
+	}
 }

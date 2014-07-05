@@ -36,7 +36,7 @@ interface HammerStatic {
 declare class HammerInstance {
     constructor(element: any, options?: HammerOptions);
 
-    on(gesture: string, handler: (event: HammerEvent) => void): HammerInstance;
+    on(gesture: string, handler: (event: HammerEvent, optional:any) => void): HammerInstance;
     off(gesture: string, handler: (event: HammerEvent) => void): HammerInstance;
     enable(toggle: boolean): HammerInstance;
 

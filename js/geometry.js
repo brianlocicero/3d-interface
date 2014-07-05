@@ -15,10 +15,19 @@ var PCamera = (function () {
         this.scene = scene;
         this.scene.add(this.camera);
         this.camera.lookAt(this.scene.position);
+        this.fov = this.camera.fov;
     };
 
     PCamera.prototype.getCamera = function () {
         return this.camera;
+    };
+
+    PCamera.prototype.getFov = function () {
+        return this.camera.fov;
+    };
+
+    PCamera.prototype.setFov = function (fov) {
+        this.camera.fov = fov;
     };
     return PCamera;
 })();
@@ -91,77 +100,57 @@ var Floor = (function () {
     return Floor;
 })();
 
-var myCamera = new PCamera(1024, 768, 0.1, 20000, 45, [0, 150, 400]);
-var myRenderer = new WebGLRenderer(0xEEEEEE, 1.0, true, 1024, 768);
-var myLight = new SLight(0xFFFFFF, [100, 550, 100], true);
-var myFloor = new Floor('img/WoodFine0008_S.jpg', [1000, 1000, 10, 10], Math.PI / 2, -50, 67.5, true);
+var CGeometry = (function () {
+    function CGeometry(cubeVars) {
+        this.cubeVars = cubeVars;
+        this.cubeGeometry = new THREE.CubeGeometry(this.cubeVars[0], this.cubeVars[1], this.cubeVars[2], 1, 1, 1);
+        return this.cubeGeometry;
+    }
+    return CGeometry;
+})();
 
-var container, scene, renderer, stats;
-var mesh;
+var LMaterial = (function () {
+    function LMaterial(materialColor) {
+        this.materialColor = materialColor;
+        this.lambertMaterial = new THREE.MeshLambertMaterial({ color: this.materialColor });
+        return this.lambertMaterial;
+    }
+    return LMaterial;
+})();
 
-init();
-animate();
+var Mesh = (function () {
+    function Mesh(geometry, material, castShadow) {
+        this.geometry = geometry;
+        this.material = material;
+        this.castShadow = castShadow;
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.castShadow = this.castShadow;
+    }
+    Mesh.prototype.addMesh = function (scene) {
+        this.scene = scene;
+        scene.add(this.mesh);
+    };
 
-// FUNCTIONS
-function init() {
-    // SCENE
-    scene = new THREE.Scene();
-    var axes = new THREE.AxisHelper(0);
-    scene.add(axes);
+    Mesh.prototype.getMesh = function () {
+        return this.mesh;
+    };
 
-    myCamera.addCamera(scene);
-    myLight.addLight(scene);
-    myFloor.addFloor(scene);
+    Mesh.prototype.setPosition = function (position) {
+        this.position = position;
+        this.mesh.position.set(position[0], position[1], position[2]);
+    };
+    return Mesh;
+})();
 
-    container = document.getElementById('sceneHolder');
-    container.appendChild(myRenderer.getRenderer().domElement);
-
-    // SKYBOX
-    var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
-    var skyBoxMaterial = new THREE.MeshBasicMaterial({ color: 0x9999ff, side: THREE.BackSide });
-    var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
-    scene.add(skyBox);
-
-    ////////////
-    // CUSTOM //
-    ////////////
-    var geometry = new THREE.CubeGeometry(100, 100, 100, 1, 1, 1);
-    var material = new THREE.MeshLambertMaterial({ color: 0xd6ccbe });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 60, 50);
-    mesh.castShadow = true;
-    scene.add(mesh);
-}
-
-//helpers
-var rotObjectMatrix;
-function rotateAroundObjectAxis(object, axis, radians) {
-    rotObjectMatrix = new THREE.Matrix4();
-    rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
-    object.matrix.multiply(rotObjectMatrix);
-    object.rotation.setFromRotationMatrix(object.matrix);
-}
-
-var rotWorldMatrix;
-function rotateAroundWorldAxis(object, axis, radians) {
-    rotWorldMatrix = new THREE.Matrix4();
-    rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-    rotWorldMatrix.multiply(object.matrix);
-    object.matrix = rotWorldMatrix;
-    object.rotation.setFromRotationMatrix(object.matrix);
-}
-
-function updateMaterial(material) {
-    var newMaterial = material;
-    mesh.material = newMaterial;
-    mesh.material.needsUpdate = true;
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    render();
-}
-
-function render() {
-    myRenderer.getRenderer().render(scene, myCamera.getCamera());
-}
+var Scene = (function () {
+    function Scene(axesHelper) {
+        this.scene = new THREE.Scene();
+        this.axesHelper = axesHelper;
+        if (axesHelper) {
+            this.axes = new THREE.AxisHelper(0);
+            this.scene.add(this.axes);
+        }
+        return this.scene;
+    }
+    return Scene;
+})();
