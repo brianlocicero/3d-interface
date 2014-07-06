@@ -103,7 +103,7 @@ var Floor = (function () {
 var CGeometry = (function () {
     function CGeometry(cubeVars) {
         this.cubeVars = cubeVars;
-        this.cubeGeometry = new THREE.CubeGeometry(this.cubeVars[0], this.cubeVars[1], this.cubeVars[2], 1, 1, 1);
+        this.cubeGeometry = new THREE.CubeGeometry(100, 100, 100, 1, 1, 1);
         return this.cubeGeometry;
     }
     return CGeometry;

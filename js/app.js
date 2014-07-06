@@ -4,13 +4,13 @@
 /// <reference path="geometry.ts" />
 var pinched = false;
 var zooming = false;
-var zoomValue = 1.0;
+var zoomValue = 1;
 var zoomInterval;
 var container;
 
 // geometry classes
-var myCamera = new PCamera(1024, 768, 0.1, 20000, 45, [0, 150, 400]);
-var myRenderer = new WebGLRenderer(0xEEEEEE, 1.0, true, 1024, 768);
+var myCamera = new PCamera(800, 600, 0.1, 20000, 45, [0, 150, 400]);
+var myRenderer = new WebGLRenderer(0xEEEEEE, 1.0, true, 800, 600);
 var myLight = new SLight(0xFFFFFF, [100, 550, 100], true);
 var myFloor = new Floor('img/WoodFine0008_S.jpg', [1000, 1000, 10, 10], Math.PI / 2, -50, 67.5, true);
 var myCube = new CGeometry([100, 100, 100]);
@@ -49,31 +49,25 @@ function rotateAroundWorldAxis(axis, radians) {
 }
 
 function zoomIn() {
-    /*
     zoomValue -= .01;
-    
-    if (zoomValue <= .5) {
-    clearInterval(zoomInterval);
-    zooming = false;
-    return;
+    if (zoomValue <= .9) {
+        clearInterval(zoomInterval);
+        zooming = false;
+        return;
     }
-    myCamera.setFov(myCamera.getFov() * zoomValue);
+    myCamera.getCamera().fov = myCamera.getCamera().fov * zoomValue;
     myCamera.getCamera().updateProjectionMatrix();
-    */
-    myCamera.setFov(45);
 }
 
 function zoomOut() {
-    /*
     zoomValue += .01;
     if (zoomValue >= 1) {
-    clearInterval(zoomInterval);
-    zooming = false;
-    return;
+        clearInterval(zoomInterval);
+        zooming = false;
+        return;
     }
-    myCamera.setFov(myCamera.getFov() * zoomValue);
+    myCamera.getCamera().fov = myCamera.getCamera().fov * zoomValue;
     myCamera.getCamera().updateProjectionMatrix();
-    */
 }
 
 //Hammer Touch Menu
@@ -102,7 +96,7 @@ var sceneHolderDrag = Hammer(document.getElementById("sceneHolder")).on("drag", 
 
 var sceneHolderDoubleTap = Hammer(document.getElementById("sceneHolder")).on("doubletap", function (event) {
     if (pinched) {
-        myCamera.setFov(45);
+        myCamera.getCamera().fov = 45;
         myCamera.getCamera().updateProjectionMatrix();
         pinched = false;
         return;
@@ -120,15 +114,17 @@ var sceneHolderDoubleTap = Hammer(document.getElementById("sceneHolder")).on("do
 });
 
 var sceneHolderPinchIn = Hammer(document.getElementById("sceneHolder")).on("pinchin", function (event) {
-    //$("#pinchScale").val( "" + event.gesture.scale + "");
-    myCamera.setFov(myCamera.getFov() * event.gesture.scale);
+    console.log(event.gesture.scale);
+    myCamera.getCamera().fov = Math.floor(45 * event.gesture.scale);
     myCamera.getCamera().updateProjectionMatrix();
     pinched = true;
 });
 
 var sceneHolderPinchOut = Hammer(document.getElementById("sceneHolder")).on("pinchout", function (event) {
+    console.log(event.gesture.scale);
+
     //$("#pinchScale").val( "" + event.gesture.scale + "");
-    myCamera.setFov(myCamera.getFov() * event.gesture.scale);
+    myCamera.getCamera().fov = Math.floor(45 * event.gesture.scale);
     myCamera.getCamera().updateProjectionMatrix();
     pinched = true;
 });

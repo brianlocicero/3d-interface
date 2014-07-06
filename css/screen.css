@@ -1,9 +1,9 @@
 body {
-	font-family: "Lato", Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 }
 
 .main {
-	width:1024px;
+	width:800px;
 	margin:0 auto;
 }
 
@@ -32,8 +32,8 @@ body {
 
 /*real 3d*/
 .main .model .sceneHolder {
-  width:1024px;
-  height:566px;
+  width:800px;
+  height:600px;
   background: #efefef;
   margin:0;
   padding:0;
