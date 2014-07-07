@@ -209,4 +209,8 @@ class Scene {
 		}
 		return this.scene;
 	}
+
+	public addToScene(mesh:any):any {
+		this.scene.add(mesh);
+	}
 }

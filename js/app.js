@@ -7,23 +7,55 @@ var zooming = false;
 var zoomValue = 1;
 var zoomInterval;
 var container;
+var mesh;
 
 // geometry classes
 var myCamera = new PCamera(800, 600, 0.1, 20000, 45, [0, 150, 400]);
 var myRenderer = new WebGLRenderer(0xEEEEEE, 1.0, true, 800, 600);
-var myLight = new SLight(0xFFFFFF, [100, 550, 100], true);
-var myFloor = new Floor('img/WoodFine0008_S.jpg', [1000, 1000, 10, 10], Math.PI / 2, -50, 67.5, true);
-var myCube = new CGeometry([100, 100, 100]);
-var myMaterial = new LMaterial(0xf2f2f2);
-var myMesh = new Mesh(myCube, myMaterial, true);
-var myScene = new Scene(true);
+var myLight = new SLight(0xFFFFFF, [100, 550, 300], true);
+var myFloor = new Floor('img/pebble.jpg', [1000, 1000, 10, 10], Math.PI / 2, -50, 0, true);
+//var myCube = new CGeometry([100, 100, 100]);
+//var myMaterial = new LMaterial(0xf2f2f2);
+//var mesh = new Mesh(myCube, myMaterial, true);
+var myScene = new Scene(false);
+var loader = new THREE.STLLoader();
+var group = new THREE.Object3D();
+
+loader.load("assets/SolidHead_2_lowPoly_42k.stl", function (geometry) {
+    var material = new THREE.MeshLambertMaterial({color: 0x7777ff});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = -.5 * Math.PI;
+    mesh.scale.set(1, 1, 1);
+    THREE.GeometryUtils.center(mesh.geometry);
+    mesh.position.set(0, 50, 80);
+    mesh.castShadow = true;
+    myScene.add(mesh);
+});
+
+function onSliderChange(event) {
+    var myVal = $("#scaleSlider").val();
+    mesh.scale.set(myVal, myVal, myVal);
+    $("#scaleValue").val("" + myVal + "");
+}
+
+//skybox get into geometry
+var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );   
+var materialArray = [];
+for (var i = 0; i < 6; i++)
+    materialArray.push( new THREE.MeshBasicMaterial({
+        map: THREE.ImageUtils.loadTexture("img/sky2.jpg"),
+        side: THREE.BackSide
+    }));
+var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+myScene.add( skyBox );
 
 //geometry instances
 myCamera.addCamera(myScene);
 myLight.addLight(myScene);
 myFloor.addFloor(myScene);
-myMesh.setPosition([0, 60, 50]);
-myMesh.addMesh(myScene);
+//mesh.setPosition([0, 60, 50]);
+//mesh.addMesh(myScene);
 
 //DOM
 container = document.getElementById('sceneHolder');
@@ -43,30 +75,43 @@ function render() {
 function rotateAroundWorldAxis(axis, radians) {
     var rotWorldMatrix = new THREE.Matrix4();
     rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-    rotWorldMatrix.multiply(myMesh.getMesh().matrix);
-    myMesh.getMesh().matrix = rotWorldMatrix;
-    myMesh.getMesh().rotation.setFromRotationMatrix(myMesh.getMesh().matrix);
+    rotWorldMatrix.multiply(mesh.matrix);
+    mesh.matrix = rotWorldMatrix;
+    mesh.rotation.setFromRotationMatrix(mesh.matrix);
 }
 
+function rotateAroundObjectAxis (axis, radians) {
+  var rotObjectMatrix = new THREE.Matrix4();
+  rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
+  mesh.matrix.multiply(rotObjectMatrix);
+  mesh.rotation.setFromRotationMatrix(mesh.matrix);
+}
+
+
 function zoomIn() {
+
     zoomValue -= .01;
-    if (zoomValue <= .9) {
+    if (zoomValue <= .5) {
         clearInterval(zoomInterval);
         zooming = false;
         return;
     }
-    myCamera.getCamera().fov = myCamera.getCamera().fov * zoomValue;
+
+    myCamera.getCamera().fov = Math.round(45 * zoomValue);
     myCamera.getCamera().updateProjectionMatrix();
 }
 
 function zoomOut() {
+
     zoomValue += .01;
     if (zoomValue >= 1) {
         clearInterval(zoomInterval);
+        zoomValue = 1;
         zooming = false;
         return;
     }
-    myCamera.getCamera().fov = myCamera.getCamera().fov * zoomValue;
+
+    myCamera.getCamera().fov = Math.round(45 * zoomValue);
     myCamera.getCamera().updateProjectionMatrix();
 }
 
@@ -95,6 +140,9 @@ var sceneHolderDrag = Hammer(document.getElementById("sceneHolder")).on("drag", 
 });
 
 var sceneHolderDoubleTap = Hammer(document.getElementById("sceneHolder")).on("doubletap", function (event) {
+
+    console.log(pinched);
+
     if (pinched) {
         myCamera.getCamera().fov = 45;
         myCamera.getCamera().updateProjectionMatrix();
@@ -102,8 +150,11 @@ var sceneHolderDoubleTap = Hammer(document.getElementById("sceneHolder")).on("do
         return;
     }
 
+    console.log(zoomValue);
+
     if (!zooming) {
         if (zoomValue === 1) {
+
             zoomInterval = setInterval(zoomIn, 10);
             zooming = true;
         } else {
@@ -121,11 +172,11 @@ var sceneHolderPinchIn = Hammer(document.getElementById("sceneHolder")).on("pinc
 });
 
 var sceneHolderPinchOut = Hammer(document.getElementById("sceneHolder")).on("pinchout", function (event) {
-    console.log(event.gesture.scale);
-
+    if (event.gesture.scale < 2.5) {
     //$("#pinchScale").val( "" + event.gesture.scale + "");
     myCamera.getCamera().fov = Math.floor(45 * event.gesture.scale);
     myCamera.getCamera().updateProjectionMatrix();
+    }
     pinched = true;
 });
 

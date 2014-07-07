@@ -152,5 +152,8 @@ var Scene = (function () {
         }
         return this.scene;
     }
+    Scene.prototype.addToScene = function (mesh) {
+        this.scene.add(mesh);
+    };
     return Scene;
 })();
